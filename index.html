@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Super Trunfo de Cidades</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background-color: #f9f9f9;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input {
+      margin-bottom: 10px;
+      width: 100%;
+      padding: 6px;
+    }
+
+    .card-form {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 10px;
+    }
+
+    .result {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    select {
+      padding: 6px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Super Trunfo de Cidades</h1>
+
+  <div class="card-form">
+    <h2>Carta 1</h2>
+    <label>Nome da Cidade:</label><input type="text" id="nome1" />
+    <label>População:</label><input type="number" id="populacao1" />
+    <label>Área (km²):</label><input type="number" step="0.01" id="area1" />
+    <label>PIB (R$ bilhões):</label><input type="number" step="0.01" id="pib1" />
+    <label>Pontos Turísticos:</label><input type="number" id="pontos1" />
+  </div>
+
+  <div class="card-form">
+    <h2>Carta 2</h2>
+    <label>Nome da Cidade:</label><input type="text" id="nome2" />
+    <label>População:</label><input type="number" id="populacao2" />
+    <label>Área (km²):</label><input type="number" step="0.01" id="area2" />
+    <label>PIB (R$ bilhões):</label><input type="number" step="0.01" id="pib2" />
+    <label>Pontos Turísticos:</label><input type="number" id="pontos2" />
+  </div>
+
+  <div>
+    <h2>Escolha os dois atributos para comparar</h2>
+    <label>Atributo 1:</label>
+    <select id="atributo1" onchange="updateAtributo2Options()">
+      <option value="populacao">População</option>
+      <option value="area">Área</option>
+      <option value="pib">PIB</option>
+      <option value="pontos">Pontos Turísticos</option>
+      <option value="densidade">Densidade Demográfica</option>
+      <option value="pibPerCapita">PIB per Capita</option>
+    </select>
+
+    <label>Atributo 2:</label>
+    <select id="atributo2">
+      <!-- preenchido via JS -->
+    </select>
+
+    <button onclick="comparar()">Comparar Cartas</button>
+  </div>
+
+  <div class="result" id="resultado"></div>
+
+  <script>
+    function updateAtributo2Options() {
+      const atributo1 = document.getElementById("atributo1").value;
+      const atributo2 = document.getElementById("atributo2");
+
+      const atributos = {
+        populacao: "População",
+        area: "Área",
+        pib: "PIB",
+        pontos: "Pontos Turísticos",
+        densidade: "Densidade Demográfica",
+        pibPerCapita: "PIB per Capita"
+      };
+
+      atributo2.innerHTML = "";
+
+      for (let key in atributos) {
+        if (key !== atributo1) {
+          const opt = document.createElement("option");
+          opt.value = key;
+          opt.innerText = atributos[key];
+          atributo2.appendChild(opt);
+        }
+      }
+    }
+
+    updateAtributo2Options(); // inicial
+
+    function comparar() {
+      const nome1 = document.getElementById("nome1").value;
+      const nome2 = document.getElementById("nome2").value;
+      const pop1 = parseInt(document.getElementById("populacao1").value);
+      const pop2 = parseInt(document.getElementById("populacao2").value);
+      const area1 = parseFloat(document.getElementById("area1").value);
+      const area2 = parseFloat(document.getElementById("area2").value);
+      const pib1 = parseFloat(document.getElementById("pib1").value);
+      const pib2 = parseFloat(document.getElementById("pib2").value);
+      const pontos1 = parseInt(document.getElementById("pontos1").value);
+      const pontos2 = parseInt(document.getElementById("pontos2").value);
+
+      const dens1 = pop1 / area1;
+      const dens2 = pop2 / area2;
+      const ppc1 = (pib1 * 1e9) / pop1;
+      const ppc2 = (pib2 * 1e9) / pop2;
+
+      const atributos = {
+        populacao: [pop1, pop2],
+        area: [area1, area2],
+        pib: [pib1, pib2],
+        pontos: [pontos1, pontos2],
+        densidade: [dens1, dens2],
+        pibPerCapita: [ppc1, ppc2]
+      };
+
+      const nomesAtributos = {
+        populacao: "População",
+        area: "Área",
+        pib: "PIB",
+        pontos: "Pontos Turísticos",
+        densidade: "Densidade Demográfica",
+        pibPerCapita: "PIB per Capita"
+      };
+
+      const a1 = document.getElementById("atributo1").value;
+      const a2 = document.getElementById("atributo2").value;
+
+      let valor1a = atributos[a1][0];
+      let valor2a = atributos[a1][1];
+
+      let valor1b = atributos[a2][0];
+      let valor2b = atributos[a2][1];
+
+      const venceuA1 = a1 === "densidade" ? (valor1a < valor2a) : (valor1a > valor2a);
+      const venceuA2 = a2 === "densidade" ? (valor1b < valor2b) : (valor1b > valor2b);
+
+      const soma1 = valor1a + valor1b;
+      const soma2 = valor2a + valor2b;
+
+      let vencedor = "";
+      if (soma1 > soma2) vencedor = `Carta 1 (${nome1}) venceu!`;
+      else if (soma2 > soma1) vencedor = `Carta 2 (${nome2}) venceu!`;
+      else vencedor = "Empate!";
+
+      document.getElementById("resultado").innerHTML = `
+        <h2>Resultado da Comparação</h2>
+        <p><strong>Carta 1:</strong> ${nome1}</p>
+        <p><strong>Carta 2:</strong> ${nome2}</p>
+        <p><strong>Atributo 1:</strong> ${nomesAtributos[a1]} - Carta 1: ${valor1a.toFixed(2)} | Carta 2: ${valor2a.toFixed(2)}</p>
+        <p><strong>Atributo 2:</strong> ${nomesAtributos[a2]} - Carta 1: ${valor1b.toFixed(2)} | Carta 2: ${valor2b.toFixed(2)}</p>
+        <p><strong>Soma dos Atributos:</strong> Carta 1: ${soma1.toFixed(2)} | Carta 2: ${soma2.toFixed(2)}</p>
+        <h3>${vencedor}</h3>
+      `;
+    }
+  </script>
+</body>
+</html>
